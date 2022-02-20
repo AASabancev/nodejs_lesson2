@@ -26,7 +26,6 @@ const sendMessage = () => {
 app.get('/', function (req, res, next) {
   res.setHeader('Content-Type', 'text/html; charset=utf-8');
   res.setHeader('Transfer-Encoding', 'chunked');
-  res.write(`Hello!, Your settings process.env.INTERVAL:${process.env.INTERVAL}, process.env.CLEAR_INTERVAL:${process.env.CLEAR_INTERVAL}\n`);
   connections.push({
     startDate: new Date(),
     res: res
@@ -36,5 +35,6 @@ app.get('/', function (req, res, next) {
 sendMessage();
 
 app.listen(3000, function () {
+  console.log(`Hello!, Your settings INTERVAL:${process.env.INTERVAL}, CLEAR_INTERVAL:${process.env.CLEAR_INTERVAL}`);
   console.log('Example app listening on port 3000');
 });

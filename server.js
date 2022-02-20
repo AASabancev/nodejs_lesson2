@@ -1,36 +1,32 @@
-
+require('dotenv').config();
 const express = require('express');
 const app = express();
 
-const connections = [];
-
-const interval = process.argv[2] || 1000;
-const maxTime = process.argv[3] || 10;
+let connections = [];
 
 const sendMessage = () => {
   setTimeout(() => {
-    connections.forEach((obj, i) => {
-      const currentDate = new Date();
-      const connectedTime = obj.startDate;
-      const diffSec = Math.round((currentDate - connectedTime) / 1000);
+    const currentDate = new Date();
+    console.log(`Current date: ${currentDate.toISOString()}`);
 
-      obj.res.write(`Client #${i}, Date: ${currentDate.toISOString()}, Connected seconds: ${diffSec}\n`);
+    connections = connections.map((obj, i) => {
+      const diffSec = Math.round((currentDate - obj.startDate) / 1000);
 
-      if (diffSec > maxTime) {
-        obj.res.write(`Your connection is too long (MAX: ${maxTime} sec.)\n`);
-        obj.res.end();
-        delete (connections[i]);
+      if (diffSec > process.env.CLEAR_INTERVAL) {
+        obj.startDate = new Date();
+        obj.res.write(`Current Date: ${currentDate.toISOString()}\n`);
       }
+      return obj;
     });
 
     sendMessage();
-  }, interval);
+  }, process.env.INTERVAL);
 };
 
 app.get('/', function (req, res, next) {
   res.setHeader('Content-Type', 'text/html; charset=utf-8');
   res.setHeader('Transfer-Encoding', 'chunked');
-  res.write(`Hello!, Your settings interval:${interval}, maxTime:${maxTime}\n`);
+  res.write(`Hello!, Your settings process.env.INTERVAL:${process.env.INTERVAL}, process.env.CLEAR_INTERVAL:${process.env.CLEAR_INTERVAL}\n`);
   connections.push({
     startDate: new Date(),
     res: res
